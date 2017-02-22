@@ -31,7 +31,7 @@ function constantToSQL(value: any): SQL {
 }
 
 export class ConstantExpression<T> extends Expression<T> {
-  constructor(public value: T) {
+  constructor(public readonly value: T) {
     super();
   }
   evaluate() {
@@ -56,8 +56,9 @@ const normalizeExpression = <T>(expression: Expr<T>) => {
 
 class UnaryExpression<TResult, TArg> extends Expression<TResult> {
   constructor(
-    public evalFunc: (arg: TArg) => TResult, public sqlOp: string,
-    public arg: Expression<TArg>
+    public readonly evalFunc: (arg: TArg) => TResult,
+    public readonly sqlOp: string,
+    public readonly arg: Expression<TArg>
   ) {
     super();
   }
@@ -77,8 +78,10 @@ class UnaryExpression<TResult, TArg> extends Expression<TResult> {
 
 class BinaryExpression<TResult, TArg1, TArg2> extends Expression<TResult> {
   constructor(
-    public evalFunc: (arg1: TArg1, arg2: TArg2) => TResult, public sqlOp: string,
-    public arg1: Expression<TArg1>, public arg2: Expression<TArg2>
+    public readonly evalFunc: (arg1: TArg1, arg2: TArg2) => TResult,
+    public readonly sqlOp: string,
+    public readonly arg1: Expression<TArg1>,
+    public readonly arg2: Expression<TArg2>
   ) {
     super();
   }
@@ -100,9 +103,9 @@ class BinaryExpression<TResult, TArg1, TArg2> extends Expression<TResult> {
 
 class CommutativeExpression<TResult, TArg> extends Expression<TResult> {
   constructor(
-    public evalFunc: (args: TArg[]) => TResult,
-    public sqlOp: string, public sqlUnit: string,
-    public args: Expression<TArg>[]
+    public readonly evalFunc: (args: TArg[]) => TResult,
+    public readonly sqlOp: string, public sqlUnit: string,
+    public readonly args: Expression<TArg>[]
   ) {
     super();
   }
@@ -132,7 +135,10 @@ class CommutativeExpression<TResult, TArg> extends Expression<TResult> {
 }
 
 class InExpression<T> extends Expression<boolean> {
-  constructor(public arg1: Expression<T>, public arg2: Expression<T[]>) { // TODO: this should not be fixed to array
+  constructor(
+    public readonly arg1: Expression<T>,
+    public readonly arg2: Expression<T[]>, // TODO: this should not be fixed to array
+  ) {
     super();
   }
   evaluate() {

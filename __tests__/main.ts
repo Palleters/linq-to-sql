@@ -6,9 +6,7 @@ import {
 } from '..';
 import { ISchema, sqlSchema, objectSchema, customerList, checkQuery } from '../testlib/schema';
 
-// IN for any field
-// AND/OR
-// extensibiliy
+// TODO: extensibiliy
 
 describe('BasicSchema', () => {
   describe('when all customers are selected', () => {

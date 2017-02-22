@@ -8,7 +8,9 @@ export abstract class RecordExpression<T> extends Expression<T> {
 }
 
 export class SQLRecordExpression<T> extends RecordExpression<T> {
-  constructor(public alias: string) {
+  constructor(
+    public readonly alias: string,
+  ) {
     super();
   }
   evaluate(): T {
@@ -20,7 +22,9 @@ export class SQLRecordExpression<T> extends RecordExpression<T> {
 }
 
 export class ObjectExpression<T> extends RecordExpression<T> {
-  constructor(public object: T) {
+  constructor(
+    public readonly object: T,
+  ) {
     super();
   }
   evaluate(): T {
@@ -32,7 +36,10 @@ export class ObjectExpression<T> extends RecordExpression<T> {
 }
 
 export class FieldExpression<TRecord, K extends keyof TRecord> extends Expression<TRecord[K]> {
-  constructor(public record: RecordExpression<TRecord>, public fieldName: K) {
+  constructor(
+    public readonly record: RecordExpression<TRecord>,
+    public readonly fieldName: K,
+  ) {
     super();
   }
   evaluate() {

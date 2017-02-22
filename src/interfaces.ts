@@ -7,7 +7,9 @@ export interface IQueryable<T> {
 }
 
 export abstract class SQLQueryable<T> implements IQueryable<T> {
-  constructor(public alias: string) {
+  constructor(
+    public readonly alias: string,
+  ) {
   }
   abstract sql(): SQL;
   where(filter: (item: RecordExpression<T>) => Expression<boolean>): SQLQueryable<T> {
@@ -18,7 +20,10 @@ export abstract class SQLQueryable<T> implements IQueryable<T> {
 export class SQLFilter<T> extends SQLQueryable<T> {
   filter: Expression<boolean>;
 
-  constructor(public source: SQLQueryable<T>, filter: (item: RecordExpression<T>) => Expression<boolean>) {
+  constructor(
+    public readonly source: SQLQueryable<T>,
+    filter: (item: RecordExpression<T>) => Expression<boolean>,
+  ) {
     super('f');
     this.filter = filter(new SQLRecordExpression<T>(this.alias));
   }
@@ -34,7 +39,9 @@ export class SQLFilter<T> extends SQLQueryable<T> {
 }
 
 export class SQLTable<T> extends SQLQueryable<T> {
-  constructor(public tableName: string) {
+  constructor(
+    public readonly tableName: string,
+  ) {
     super('t');
   }
 
@@ -48,7 +55,9 @@ export class SQLTable<T> extends SQLQueryable<T> {
 }
 
 export class ObjectQueryable<T> implements IQueryable<T> {
-  constructor(public value: T[]) {
+  constructor(
+    public readonly value: T[],
+  ) {
   }
   where(filter: (item: RecordExpression<T>) => Expression<boolean>): ObjectQueryable<T> {
     return new ObjectQueryable<T>(this.value.filter(item => filter(new ObjectExpression(item)).evaluate()));
