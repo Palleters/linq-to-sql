@@ -3,6 +3,7 @@
         "noImplicitAny": true,
         "noImplicitReturns": true,
         "noImplicitThis": true,
-        "target": "es5"
+        "target": "es2015",
+        "module": "commonjs"
     }
 }

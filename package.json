@@ -1,7 +1,10 @@
 {
   "dependencies": {
     "@types/jest": "^18.1.1",
+    "@types/knex": "^0.0.41",
     "jest": "^19.0.0",
+    "knex": "^0.12.7",
+    "pg": "^6.1.2",
     "ts-jest": "^19.0.0",
     "typescript": "^2.1.6"
   },

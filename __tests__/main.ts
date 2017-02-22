@@ -4,64 +4,13 @@ import {
     IQueryable, SQLQueryable, SQLTable, ObjectQueryable,
     equals, field, isOneOf, or, and, not
 } from '..';
+import { ISchema, sqlSchema, objectSchema, customerList, checkQuery } from '../testlib/schema';
 
 // IN for any field
 // AND/OR
 // extensibiliy
 
 describe('BasicSchema', () => {
-    class Customer {
-        customerID: number;
-        name: string;
-    }
-
-    interface ISchema {
-        customers: IQueryable<Customer>;
-    }
-
-    class SQLSchema implements ISchema {
-        customers: SQLQueryable<Customer> = new SQLTable<Customer>('customer');
-    }
-
-    const customerList = [
-        {
-            customerID: 1,
-            name: 'customer 1',
-        },
-        {
-            customerID: 2,
-            name: 'customer 2',
-        },
-        {
-            customerID: 3,
-            name: 'customer 3',
-        },
-        {
-            customerID: 4,
-            name: 'customer 4',
-        },
-    ];
-
-    class ObjectSchema implements ISchema {
-        customers = new ObjectQueryable<Customer>(customerList);
-    }
-
-    const sqlSchema = new SQLSchema();
-    const objectSchema = new ObjectSchema();
-
-    const checkQuery = <T>(
-        query: (schema: ISchema) => IQueryable<T>,
-        expectedSQL: string,
-        expectedObjects: T[],
-    ) => {
-        it('composes the right SQL', () => {
-            expect((query(sqlSchema) as SQLQueryable<any>).sql).toBe(expectedSQL);
-        });
-        it('returns the right objects', () => {
-            expect((query(objectSchema) as ObjectQueryable<any>).value).toEqual(expectedObjects);
-        });
-    };
-
     describe('when all customers are selected', () => {
         checkQuery(
             (schema: ISchema) => schema.customers,
