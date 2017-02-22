@@ -1,6 +1,9 @@
 import { Expression } from './expressions';
 
 export abstract class RecordExpression<T> extends Expression<T> {
+    field<K extends keyof T>(fieldName: K): FieldExpression<T, K> {
+        return field(this, fieldName);
+    }
 }
 
 export class SQLRecordExpression<T> extends RecordExpression<T> {

@@ -101,7 +101,7 @@ describe('BasicSchema', () => {
                         field(c, 'name').equals('customer 4'),
                     ),
                     not(
-                        field(c, 'customerID').equals(3),
+                        c.field('customerID').equals(3),
                     ),
                 )
             ),
