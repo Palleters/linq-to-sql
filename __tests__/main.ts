@@ -96,16 +96,16 @@ describe('BasicSchema', () => {
             (schema: ISchema) => schema.customers.where(c =>
                 and(
                     or(
-                        equals(field(c, 'customerID'), 1),
-                        equals(field(c, 'customerID'), 3),
-                        equals(field(c, 'customerID'), 4),
+                        field(c, 'customerID').equals(1),
+                        field(c, 'customerID').equals(3),
+                        field(c, 'name').equals('customer 4'),
                     ),
                     not(
-                        equals(field(c, 'customerID'), 3),
+                        field(c, 'customerID').equals(3),
                     ),
                 )
             ),
-            'SELECT * FROM (SELECT * FROM customer t) f WHERE (((f.customerID = 1) OR (f.customerID = 3) OR (f.customerID = 4)) AND (NOT (f.customerID = 3)))',
+            'SELECT * FROM (SELECT * FROM customer t) f WHERE (((f.customerID = 1) OR (f.customerID = 3) OR (f.name = \'customer 4\')) AND (NOT (f.customerID = 3)))',
             [
                 customerList[0],
                 customerList[3],

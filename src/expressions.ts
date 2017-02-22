@@ -1,6 +1,13 @@
 export abstract class Expression<T> {
     abstract evaluate(): T;
     abstract sql(): string;
+
+    equals(other: Expr<T>): Expression<boolean> {
+        return equals(this, other);
+    }
+    isOneOf(set: Expr<T>[]): Expression<boolean> {
+        return isOneOf(this, set);
+    }
 }
 
 function constantToSQL(value: any): string {
@@ -117,18 +124,17 @@ export const commutativeOp = <TResult, TArg>(
     args: Expr<TArg>[]
 ) => new CommutativeExpression(evalFunc, sqlOp, sqlUnit, args.map(normalizeExpression));
 
-export const equals = <T>(arg1: Expr<T>, arg2: Expr<T>) =>
+export const equals = <T>(arg1: Expr<T>, arg2: Expr<T>): Expression<boolean> =>
     binaryOp((arg1, arg2) => arg1 === arg2, '=', arg1, arg2);
 
-export const and = <T>(...args: Expr<boolean>[]) =>
+export const and = (...args: Expr<boolean>[]) =>
     commutativeOp(args => args.every(item => item), 'AND', 'TRUE', args);
 
-export const or = <T>(...args: Expr<boolean>[]) =>
+export const or = (...args: Expr<boolean>[]) =>
     commutativeOp(args => args.some(item => item), 'OR', 'FALSE', args);
 
-export const not = <T>(arg: Expr<boolean>) =>
+export const not = (arg: Expr<boolean>) =>
     unaryOp((arg) => !arg, 'NOT', arg);
 
 export const isOneOf = <T>(arg1: Expr<T>, arg2: Expr<T[]>) =>
     new InExpression(normalizeExpression(arg1), normalizeExpression(arg2));
-
