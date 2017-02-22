@@ -1,6 +1,8 @@
+import { SQL, simpleSQLFragment, combineSQL } from './sql-fragment';
+
 export abstract class Expression<T> {
     abstract evaluate(): T;
-    abstract sql(): string;
+    abstract sql(): SQL;
 
     equals(other: Expr<T>): Expression<boolean> {
         return equals(this, other);
@@ -10,17 +12,22 @@ export abstract class Expression<T> {
     }
 }
 
-function constantToSQL(value: any): string {
+function constantToSQL(value: any): SQL {
     if (Array.isArray(value)) {
-        return value.map(constantToSQL).join(', ');
+        if (value.length === 0) {
+            return simpleSQLFragment('');
+        }
+        let result = constantToSQL(value[0]);
+        for (let i = 1; i < value.length; i++) {
+            result = combineSQL(
+                result,
+                simpleSQLFragment(', '),
+                constantToSQL(value[i]),
+            );
+        }
+        return result;
     }
-    if (typeof value === 'string') {
-        return `'${value.replace(`'`, `''`)}'`;
-    }
-    if (typeof value === 'number') {
-        return `${value}`;
-    }
-    throw new Error(`constantToSQL for ${typeof value} not implemented`);
+    return simpleSQLFragment('?', value);
 }
 
 export class ConstantExpression<T> extends Expression<T> {
@@ -58,7 +65,13 @@ class UnaryExpression<TResult, TArg> extends Expression<TResult> {
         return this.evalFunc(this.arg.evaluate());
     }
     sql() {
-        return `(${this.sqlOp} ${this.arg.sql()})`;
+        return combineSQL(
+            simpleSQLFragment('('),
+            simpleSQLFragment(this.sqlOp),
+            simpleSQLFragment(' '),
+            this.arg.sql(),
+            simpleSQLFragment(')'),
+        );
     }
 }
 
@@ -73,7 +86,15 @@ class BinaryExpression<TResult, TArg1, TArg2> extends Expression<TResult> {
         return this.evalFunc(this.arg1.evaluate(), this.arg2.evaluate());
     }
     sql() {
-        return `(${this.arg1.sql()} ${this.sqlOp} ${this.arg2.sql()})`;
+        return combineSQL(
+            simpleSQLFragment('('),
+            this.arg1.sql(),
+            simpleSQLFragment(' '),
+            simpleSQLFragment(this.sqlOp),
+            simpleSQLFragment(' '),
+            this.arg2.sql(),
+            simpleSQLFragment(')'),
+        );
     }
 }
 
@@ -90,9 +111,23 @@ class CommutativeExpression<TResult, TArg> extends Expression<TResult> {
     }
     sql() {
         if (this.args.length === 0) {
-            return this.sqlUnit;
+            return simpleSQLFragment(this.sqlUnit);
         }
-        return `(${this.args.map(arg => arg.sql()).join(` ${this.sqlOp} `)})`
+        let result = combineSQL(
+            simpleSQLFragment('('),
+            this.args[0].sql(),
+        );
+        for (let i = 1; i < this.args.length; i++) {
+            result = combineSQL(
+                result,
+                simpleSQLFragment(' '),
+                simpleSQLFragment(this.sqlOp),
+                simpleSQLFragment(' '),
+                this.args[i].sql(),
+            );
+        }
+        result = combineSQL(result, simpleSQLFragment(')'));
+        return result;
     }
 }
 
@@ -105,7 +140,13 @@ class InExpression<T> extends Expression<boolean> {
         return this.arg2.evaluate().some(item => arg1Value === item);
     }
     sql() {
-        return `(${this.arg1.sql()} IN (${this.arg2.sql()}))`;
+        return combineSQL(
+            simpleSQLFragment('('),
+            this.arg1.sql(),
+            simpleSQLFragment(' IN ('),
+            this.arg2.sql(),
+            simpleSQLFragment('))'),
+        );
     }
 }
 

@@ -14,7 +14,10 @@ describe('BasicSchema', () => {
     describe('when all customers are selected', () => {
         checkQuery(
             (schema: ISchema) => schema.customers,
-            'SELECT * FROM customer t',
+            {
+                sql: 'SELECT * FROM customer t',
+                bindings: [],
+            },
             customerList,
         );
     });
@@ -22,7 +25,10 @@ describe('BasicSchema', () => {
     describe('when customer is selected by ID', () => {
         checkQuery(
             (schema: ISchema) => schema.customers.where(c => equals(field(c, 'customerID'), 1)),
-            'SELECT * FROM (SELECT * FROM customer t) f WHERE (f.customerID = 1)',
+            {
+                sql: 'SELECT * FROM (SELECT * FROM customer t) f WHERE (f.customerID = ?)',
+                bindings: [1],
+            },
             [
                 customerList[0],
             ],
@@ -32,7 +38,10 @@ describe('BasicSchema', () => {
     describe('when customer is selected using isOneOf', () => {
         checkQuery(
             (schema: ISchema) => schema.customers.where(c => isOneOf(field(c, 'customerID'), [1, 3])),
-            'SELECT * FROM (SELECT * FROM customer t) f WHERE (f.customerID IN (1, 3))',
+            {
+                sql: 'SELECT * FROM (SELECT * FROM customer t) f WHERE (f.customerID IN (?, ?))',
+                bindings: [1, 3],
+            },
             [
                 customerList[0],
                 customerList[2],
@@ -54,7 +63,10 @@ describe('BasicSchema', () => {
                     ),
                 )
             ),
-            'SELECT * FROM (SELECT * FROM customer t) f WHERE (((f.customerID = 1) OR (f.customerID = 3) OR (f.name = \'customer 4\')) AND (NOT (f.customerID = 3)))',
+            {
+                sql: 'SELECT * FROM (SELECT * FROM customer t) f WHERE (((f.customerID = ?) OR (f.customerID = ?) OR (f.name = ?)) AND (NOT (f.customerID = ?)))',
+                bindings: [1, 3, 'customer 4', 3],
+            },
             [
                 customerList[0],
                 customerList[3],

@@ -1,5 +1,5 @@
 import {
-    IQueryable, SQLQueryable, SQLTable, ObjectQueryable,
+    IQueryable, SQLQueryable, SQLTable, ObjectQueryable, evalSQL, EvaluatedSQL,
 } from '..';
 
 export class Customer {
@@ -43,13 +43,19 @@ export const objectSchema = new ObjectSchema();
 
 export const checkQuery = <T>(
     query: (schema: ISchema) => IQueryable<T>,
-    expectedSQL: string,
+    expectedSQL: EvaluatedSQL,
     expectedObjects: T[],
 ) => {
     it('composes the right SQL', () => {
-        expect((query(sqlSchema) as SQLQueryable<any>).sql).toBe(expectedSQL);
+        expect(
+            evalSQL(
+                (query(sqlSchema) as SQLQueryable<any>).sql()
+            )
+        ).toEqual(expectedSQL);
     });
     it('returns the right objects', () => {
-        expect((query(objectSchema) as ObjectQueryable<any>).value).toEqual(expectedObjects);
+        expect(
+            (query(objectSchema) as ObjectQueryable<any>).value
+        ).toEqual(expectedObjects);
     });
 };

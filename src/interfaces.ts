@@ -1,5 +1,6 @@
 import { Expression } from './expressions';
 import { RecordExpression, SQLRecordExpression, ObjectExpression } from './record-expressions';
+import { SQL, combineSQL, simpleSQLFragment } from './sql-fragment';
 
 export interface IQueryable<T> {
     where(filter: (item: RecordExpression<T>) => Expression<boolean>): IQueryable<T>;
@@ -8,7 +9,7 @@ export interface IQueryable<T> {
 export abstract class SQLQueryable<T> implements IQueryable<T> {
     constructor(public alias: string) {
     }
-    abstract get sql(): string;
+    abstract sql(): SQL;
     where(filter: (item: RecordExpression<T>) => Expression<boolean>): SQLQueryable<T> {
         return new SQLFilter(this, filter);
     }
@@ -22,19 +23,27 @@ export class SQLFilter<T> extends SQLQueryable<T> {
         this.filter = filter(new SQLRecordExpression<T>(this.alias));
     }
 
-    get sql() {
-        return `SELECT * FROM (${this.source.sql}) f WHERE ${this.filter.sql()}`;
+    sql() {
+        return combineSQL(
+            simpleSQLFragment('SELECT * FROM ('),
+            this.source.sql(),
+            simpleSQLFragment(') f WHERE '),
+            this.filter.sql(),
+        );
     }
 }
-
 
 export class SQLTable<T> extends SQLQueryable<T> {
     constructor(public tableName: string) {
         super('t');
     }
 
-    get sql() {
-        return `SELECT * FROM ${this.tableName} t`;
+    sql() {
+        return combineSQL(
+            simpleSQLFragment('SELECT * FROM '),
+            simpleSQLFragment(this.tableName),
+            simpleSQLFragment(' t'),
+        );
     }
 }
 

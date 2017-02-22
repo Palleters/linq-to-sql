@@ -1,4 +1,5 @@
 import { Expression } from './expressions';
+import { simpleSQLFragment, combineSQL, SQL } from './sql-fragment';
 
 export abstract class RecordExpression<T> extends Expression<T> {
     field<K extends keyof T>(fieldName: K): FieldExpression<T, K> {
@@ -14,7 +15,7 @@ export class SQLRecordExpression<T> extends RecordExpression<T> {
         throw new Error('Cannot evaluate SQLRecord');
     }
     sql() {
-        return this.alias;
+        return simpleSQLFragment(this.alias);
     }
 }
 
@@ -25,7 +26,7 @@ export class ObjectExpression<T> extends RecordExpression<T> {
     evaluate(): T {
         return this.object;
     }
-    sql(): string {
+    sql(): SQL {
         throw new Error('Cannot get SQL for ObjectExpression');
     }
 }
@@ -38,7 +39,11 @@ export class FieldExpression<TRecord, K extends keyof TRecord> extends Expressio
         return this.record.evaluate()[this.fieldName];
     }
     sql() {
-        return `${this.record.sql()}.${this.fieldName}`;
+        return combineSQL(
+            this.record.sql(),
+            simpleSQLFragment('.'),
+            simpleSQLFragment(this.fieldName),
+        );
     }
 }
 
