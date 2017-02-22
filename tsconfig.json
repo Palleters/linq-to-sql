@@ -1,9 +1,9 @@
 {
-    "compilerOptions": {
-        "noImplicitAny": true,
-        "noImplicitReturns": true,
-        "noImplicitThis": true,
-        "target": "es2015",
-        "module": "commonjs"
-    }
+  "compilerOptions": {
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "target": "es2015",
+    "module": "commonjs"
+  }
 }

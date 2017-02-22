@@ -1,4 +1,6 @@
 {
+  "name": "linq-to-sql",
+  "version": "0.0.1",
   "dependencies": {
     "@types/jest": "^18.1.1",
     "@types/knex": "^0.0.41",
