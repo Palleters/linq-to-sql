@@ -24,7 +24,7 @@ export class SQLFilter<T> extends SQLQueryable<T> {
     public readonly source: SQLQueryable<T>,
     filter: (item: RecordExpression<T>) => Expression<boolean>,
   ) {
-    super('f');
+    super('flt');
     this.filter = filter(new SQLRecordExpression<T>(this.alias));
   }
 
@@ -42,7 +42,7 @@ export class SQLTable<T> extends SQLQueryable<T> {
   constructor(
     public readonly tableName: string,
   ) {
-    super('t');
+    super('tbl');
   }
 
   sql() {
