@@ -1,6 +1,6 @@
 /// <reference path="../node_modules/@types/jest/index.d.ts" />
 
-import { IQueryable, SQLQueryable, SQLTable, ObjectQueryable, equals, field, constant } from '../src/interfaces';
+import { IQueryable, SQLQueryable, SQLTable, ObjectQueryable, equals, field, constant, isOneOf, or, and, not } from '../src/interfaces';
 
 // IN for any field
 // AND/OR
@@ -28,6 +28,14 @@ describe('BasicSchema', () => {
         {
             customerID: 2,
             name: 'customer 2',
+        },
+        {
+            customerID: 3,
+            name: 'customer 3',
+        },
+        {
+            customerID: 4,
+            name: 'customer 4',
         },
     ];
 
@@ -62,9 +70,42 @@ describe('BasicSchema', () => {
     describe('when customer is selected by ID', () => {
         checkQuery(
             (schema: ISchema) => schema.customers.where(c => equals(field(c, 'customerID'), 1)),
-            'SELECT * FROM (SELECT * FROM customer t) f WHERE f.customerID = 1',
+            'SELECT * FROM (SELECT * FROM customer t) f WHERE (f.customerID = 1)',
             [
                 customerList[0],
+            ],
+        );
+    });
+
+    describe('when customer is selected using isOneOf', () => {
+        checkQuery(
+            (schema: ISchema) => schema.customers.where(c => isOneOf(field(c, 'customerID'), [1, 3])),
+            'SELECT * FROM (SELECT * FROM customer t) f WHERE (f.customerID IN (1, 3))',
+            [
+                customerList[0],
+                customerList[2],
+            ],
+        );
+    });
+
+    describe('when customer is selected by more complex boolean expression', () => {
+        checkQuery(
+            (schema: ISchema) => schema.customers.where(c =>
+                and(
+                    or(
+                        equals(field(c, 'customerID'), 1),
+                        equals(field(c, 'customerID'), 3),
+                        equals(field(c, 'customerID'), 4),
+                    ),
+                    not(
+                        equals(field(c, 'customerID'), 3),
+                    ),
+                )
+            ),
+            'SELECT * FROM (SELECT * FROM customer t) f WHERE (((f.customerID = 1) OR (f.customerID = 3) OR (f.customerID = 4)) AND (NOT (f.customerID = 3)))',
+            [
+                customerList[0],
+                customerList[3],
             ],
         );
     });
