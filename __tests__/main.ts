@@ -1,6 +1,9 @@
 /// <reference path="../node_modules/@types/jest/index.d.ts" />
 
-import { IQueryable, SQLQueryable, SQLTable, ObjectQueryable, equals, field, constant, isOneOf, or, and, not } from '../src/interfaces';
+import {
+    IQueryable, SQLQueryable, SQLTable, ObjectQueryable,
+    equals, field, isOneOf, or, and, not
+} from '..';
 
 // IN for any field
 // AND/OR
