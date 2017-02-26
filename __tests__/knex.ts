@@ -3,11 +3,15 @@ import { ISchema, sqlSchema, objectSchema, customerList } from '../testlib/schem
 import {
   equals, field, isOneOf, or, and, not, evalSQL
 } from '..';
+import { config as dotenvConfig } from 'dotenv';
+
+dotenvConfig();
 
 describe('knex integration', async () => {
-  const config = {
+
+  const config: knex.Config = {
     client: 'pg',
-    connection: process.env.PG_CONNECTION_STRING,
+    connection: process.env['PG_CONNECTION_STRING'],
   };
 
   const db = knex(config);
