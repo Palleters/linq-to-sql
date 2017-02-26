@@ -2,7 +2,7 @@ import {
   IQueryable, SQLQueryable, SQLTable, ObjectQueryable, evalSQL, EvaluatedSQL,
 } from '..';
 
-export class Customer {
+export type Customer = {
   customerID: number;
   name: string;
 }
@@ -12,7 +12,13 @@ export interface ISchema {
 }
 
 export class SQLSchema implements ISchema {
-  customers: SQLQueryable<Customer> = new SQLTable<Customer>('customer');
+  customers: SQLQueryable<Customer> = new SQLTable<Customer>(
+    'customer',
+    builder => ({
+      customerID: builder.columnMapping('customerID', 'customer_id'),
+      name: builder.columnMapping('name', 'name'),
+    }),
+  );
 }
 
 export const customerList = [

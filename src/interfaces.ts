@@ -32,25 +32,43 @@ export class SQLFilter<T> extends SQLQueryable<T> {
     return combineSQL(
       simpleSQLFragment('SELECT * FROM ('),
       this.source.sql(),
-      simpleSQLFragment(') f WHERE '),
+      simpleSQLFragment(`) ${this.alias} WHERE `),
       this.filter.sql(),
     );
   }
 }
 
+export class SQLTableBuilder<T> {
+  columnMapping<P extends keyof T>(columnName?: P, fieldName?: string) {
+    return new SQLColumnMapping<T, P>(columnName, fieldName);
+  }
+}
+
 export class SQLTable<T> extends SQLQueryable<T> {
+  columns: {[P in keyof T]: SQLColumnMapping<T, P>};
   constructor(
     public readonly tableName: string,
+    public definitionBuilder: (builder: SQLTableBuilder<T>) => {[P in keyof T]: SQLColumnMapping<T, P>},
   ) {
     super('tbl');
+    this.columns = definitionBuilder(new SQLTableBuilder<T>());
   }
 
   sql() {
+    const columns = (Object.keys(this.columns) as (keyof T)[])
+      .map(column => this.columns[column])
+      .map(columnMapping => `${columnMapping.fieldName} as ${columnMapping.columnName}`);
     return combineSQL(
-      simpleSQLFragment('SELECT * FROM '),
+      simpleSQLFragment(`SELECT ${columns ? columns.join(', ') : '*'} FROM `),
       simpleSQLFragment(this.tableName),
-      simpleSQLFragment(' t'),
+      simpleSQLFragment(` ${this.alias}`),
     );
+  }
+}
+
+export class SQLColumnMapping<T, P extends keyof T> {
+  constructor(public columnName: P, public fieldName: string) {
+
   }
 }
 
