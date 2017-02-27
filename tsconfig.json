@@ -5,6 +5,11 @@
     "noImplicitThis": true,
     "target": "es2015",
     "module": "commonjs",
-    "outDir": "dist"
-  }
+    "sourceMap": true,
+    "declaration": true,
+    "outDir": "lib"
+  },
+  "files": [
+    "index.ts"
+  ]
 }

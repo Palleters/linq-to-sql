@@ -54,7 +54,7 @@ const normalizeExpression = <T>(expression: Expr<T>) => {
   return constant(value);
 }
 
-class UnaryExpression<TResult, TArg> extends Expression<TResult> {
+export class UnaryExpression<TResult, TArg> extends Expression<TResult> {
   constructor(
     public readonly evalFunc: (arg: TArg) => TResult,
     public readonly sqlOp: string,
@@ -76,7 +76,7 @@ class UnaryExpression<TResult, TArg> extends Expression<TResult> {
   }
 }
 
-class BinaryExpression<TResult, TArg1, TArg2> extends Expression<TResult> {
+export class BinaryExpression<TResult, TArg1, TArg2> extends Expression<TResult> {
   constructor(
     public readonly evalFunc: (arg1: TArg1, arg2: TArg2) => TResult,
     public readonly sqlOp: string,
@@ -101,7 +101,7 @@ class BinaryExpression<TResult, TArg1, TArg2> extends Expression<TResult> {
   }
 }
 
-class CommutativeExpression<TResult, TArg> extends Expression<TResult> {
+export class CommutativeExpression<TResult, TArg> extends Expression<TResult> {
   constructor(
     public readonly evalFunc: (args: TArg[]) => TResult,
     public readonly sqlOp: string, public sqlUnit: string,
@@ -134,7 +134,7 @@ class CommutativeExpression<TResult, TArg> extends Expression<TResult> {
   }
 }
 
-class InExpression<T> extends Expression<boolean> {
+export class InExpression<T> extends Expression<boolean> {
   constructor(
     public readonly arg1: Expression<T>,
     public readonly arg2: Expression<T[]>, // TODO: this should not be fixed to array

@@ -1,6 +1,12 @@
 {
-  "name": "linq-to-sql",
-  "version": "0.0.1",
+  "name": "@palleter/linq-to-sql",
+  "version": "0.1.0",
+  "license": "MIT",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "files": [
+    "lib"
+  ],
   "dependencies": {
     "@types/dotenv": "^2.0.20",
     "@types/jest": "^18.1.1",
@@ -19,12 +25,17 @@
     "migrate": "knex migrate:latest && knex seed:run",
     "rollback": "knex migrate:rollback",
     "test": "jest",
-    "watch": "tsc --watch"
+    "watch": "tsc --watch",
+    "clean": "rimraf lib"
   },
   "jest": {
     "transform": {
       ".(ts|tsx)": "<rootDir>/node_modules/ts-jest/preprocessor.js"
     },
+    "testPathIgnorePatterns": [
+      "<rootDir>/node_modules/",
+      "<rootDir>/lib/"
+    ],
     "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$",
     "moduleFileExtensions": [
       "ts",
@@ -41,6 +52,8 @@
     }
   },
   "devDependencies": {
-    "flow-bin": "^0.39.0"
+    "flow-bin": "^0.39.0",
+    "flowgen": "^1.0.1",
+    "rimraf": "^2.6.1"
   }
 }
