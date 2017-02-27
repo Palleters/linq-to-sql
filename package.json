@@ -1,6 +1,6 @@
 {
   "name": "@palleter/linq-to-sql",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "license": "MIT",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -8,17 +8,6 @@
     "lib"
   ],
   "dependencies": {
-    "@types/dotenv": "^2.0.20",
-    "@types/jest": "^18.1.1",
-    "@types/knex": "^0.0.41",
-    "@types/pg": "^6.1.37",
-    "dotenv": "^4.0.0",
-    "jest": "^19.0.0",
-    "knex": "^0.12.7",
-    "pg": "^6.1.2",
-    "ts-jest": "^19.0.0",
-    "ts-node": "^2.1.0",
-    "typescript": "^2.1.6"
   },
   "scripts": {
     "build": "tsc",
@@ -52,8 +41,19 @@
     }
   },
   "devDependencies": {
+    "@types/dotenv": "^2.0.20",
+    "@types/jest": "^18.1.1",
+    "@types/knex": "^0.0.41",
+    "@types/pg": "^6.1.37",
+    "dotenv": "^4.0.0",
     "flow-bin": "^0.39.0",
     "flowgen": "^1.0.1",
-    "rimraf": "^2.6.1"
+    "jest": "^19.0.0",
+    "knex": "^0.12.7",
+    "pg": "^6.1.2",
+    "rimraf": "^2.6.1",
+    "ts-jest": "^19.0.0",
+    "ts-node": "^2.1.0",
+    "typescript": "^2.1.6"
   }
 }
