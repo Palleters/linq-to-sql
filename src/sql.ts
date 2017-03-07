@@ -12,6 +12,12 @@ export abstract class SQLQueryable<T> implements IQueryable<T> {
   where(filter: (item: RecordExpression<T>) => Expression<boolean>): SQLQueryable<T> {
     return new SQLFilter(this, filter);
   }
+  join<U>(
+    other: IQueryable<U>,
+    joinExpression: (t: RecordExpression<T>, u: RecordExpression<U>) => Expression<boolean>,
+  ): IQueryable<{ t: T; u: U; }> {
+    throw new Error('Method not implemented.');
+  }
 }
 
 export class SQLFilter<T> extends SQLQueryable<T> {
@@ -36,7 +42,7 @@ export class SQLFilter<T> extends SQLQueryable<T> {
 }
 
 export class SQLTableBuilder<T> {
-  columnMapping<P extends keyof T>(columnName?: P, fieldName?: string) {
+  columnMapping<P extends keyof T>(columnName: P, fieldName?: string) {
     return new SQLColumnMapping<T, P>(columnName, fieldName);
   }
 }
@@ -64,7 +70,7 @@ export class SQLTable<T> extends SQLQueryable<T> {
 }
 
 export class SQLColumnMapping<T, P extends keyof T> {
-  constructor(public columnName: P, public fieldName: string) {
+  constructor(public columnName: P, public fieldName?: string) {
 
   }
 }

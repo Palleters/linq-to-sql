@@ -1,6 +1,7 @@
 import { SQL, simpleSQLFragment, combineSQL } from './sql-fragment';
 
 export abstract class Expression<T> {
+  // TODO: these really should be separate visitor classes
   abstract evaluate(): T;
   abstract sql(): SQL;
 

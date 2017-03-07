@@ -3,6 +3,8 @@
     "noImplicitAny": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
+    "noFallthroughCasesInSwitch": true,
+    "strictNullChecks": true,
     "target": "es2015",
     "module": "commonjs",
     "sourceMap": true,
