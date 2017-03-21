@@ -42,25 +42,60 @@ export class SQLFilter<T> extends SQLQueryable<T> {
 }
 
 export class SQLTableBuilder<T> {
-  columnMapping<P extends keyof T>(columnName: P, fieldName?: string) {
-    return new SQLColumnMapping<T, P>(columnName, fieldName);
+  columnMapping<P extends keyof T>(fieldName: P, columnName?: string) {
+    return new SQLFieldMapping<T, P>(fieldName, columnName);
   }
 }
 
+export type SQLFieldMappings<T> = {[P in keyof T]: SQLFieldMapping<T, P>};
+export type SQLDefinitionBuilder<T> = (builder: SQLTableBuilder<T>) => SQLFieldMappings<T>;
+
+export class SQLTableBuilder2<T> {
+  constructor(public readonly fields: SQLFieldMappings<T>) {}
+}
+
 export class SQLTable<T> extends SQLQueryable<T> {
-  columns: {[P in keyof T]: SQLColumnMapping<T, P>};
+  readonly fieldMappings: SQLFieldMappings<T>;
+  readonly fields: (keyof T)[];
+  constructor(
+    tableName: string,
+    fields: (keyof T)[],
+    definitionBuilder?: (builder: SQLTableBuilder2<T>) => void,
+  );
+  constructor(
+    tableName: string,
+    definitionBuilder: SQLDefinitionBuilder<T>,
+  );
   constructor(
     public readonly tableName: string,
-    public definitionBuilder: (builder: SQLTableBuilder<T>) => {[P in keyof T]: SQLColumnMapping<T, P>},
+    fieldsOrDefinitionBuilder: (keyof T)[] | SQLDefinitionBuilder<T>,
+    definitionBuilder?: (builder: SQLTableBuilder2<T>) => void,
   ) {
     super('tbl');
-    this.columns = definitionBuilder(new SQLTableBuilder<T>());
+    if (typeof fieldsOrDefinitionBuilder === 'function') {
+      if (definitionBuilder) {
+        throw new Error('cannot specify multiple definitionBuilders');
+      }
+      this.fieldMappings = fieldsOrDefinitionBuilder(new SQLTableBuilder<T>());
+      this.fields = Object.keys(this.fieldMappings) as (keyof T)[];
+    } else {
+      this.fields = fieldsOrDefinitionBuilder;
+      this.fieldMappings = {} as SQLFieldMappings<T>;
+      this.fields.forEach(f => {
+        this.fieldMappings[f] = new SQLFieldMapping<T, typeof f>(f);
+      });
+      if (definitionBuilder) {
+        definitionBuilder(new SQLTableBuilder2<T>(this.fieldMappings));
+      }
+    }
   }
 
   sql() {
-    const columns = (Object.keys(this.columns) as (keyof T)[])
-      .map(column => this.columns[column])
-      .map(columnMapping => `${columnMapping.fieldName} as ${columnMapping.columnName}`);
+    const columns = this.fields
+      .map(field => this.fieldMappings[field])
+      .map(columnMapping => columnMapping.columnName
+        ? `${columnMapping.columnName} as ${columnMapping.fieldName}`
+        : columnMapping.fieldName);
     return combineSQL(
       simpleSQLFragment(`SELECT ${columns ? columns.join(', ') : '*'} FROM `),
       simpleSQLFragment(this.tableName),
@@ -69,8 +104,10 @@ export class SQLTable<T> extends SQLQueryable<T> {
   }
 }
 
-export class SQLColumnMapping<T, P extends keyof T> {
-  constructor(public columnName: P, public fieldName?: string) {
-
+export class SQLFieldMapping<T, P extends keyof T> {
+  constructor(public readonly fieldName: P, public columnName?: string) {
+  }
+  mapToColumn(columnName: string) {
+    this.columnName = columnName;
   }
 }

@@ -11,13 +11,23 @@ export interface ISchema {
   customers: IQueryable<Customer>;
 }
 
-export class SQLSchema implements ISchema {
+export class LegacySQLSchema implements ISchema {
   customers: SQLQueryable<Customer> = new SQLTable<Customer>(
     'customer',
     builder => ({
-      customerID: builder.columnMapping('customerID', 'customer_id'),
-      name: builder.columnMapping('name', 'name'),
+      'customerID': builder.columnMapping('customerID', 'customer_id'),
+      'name': builder.columnMapping('name'),
     }),
+  );
+}
+
+export class SQLSchema implements ISchema {
+  customers: SQLQueryable<Customer> = new SQLTable<Customer>(
+    'customer',
+    ['customerID', 'name'],
+    builder => {
+      builder.fields.customerID.mapToColumn('customer_id');
+    },
   );
 }
 
