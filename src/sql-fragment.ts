@@ -12,8 +12,8 @@ export const simpleSQLFragment = (sql: string, ...bindings: any[]) => ({
   })),
 });
 export const combineSQL = (...args: SQL[]): SQL => ({
-  sqlFragments: [].concat(...args.map(arg => arg.sqlFragments)),
-  bindings: [].concat(...args.map(arg => arg.bindings)),
+  sqlFragments: ([] as string[]).concat(...args.map(arg => arg.sqlFragments)),
+  bindings: ([] as  Binding<any>[]).concat(...args.map(arg => arg.bindings)),
 });
 export type EvaluatedSQL = {
   readonly sql: string;

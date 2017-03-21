@@ -53,14 +53,4 @@ describe('knex integration', async () => {
       ]);
     });
   });
-
-  describe('raw test', () => {
-    it('should not error', async () => {
-      const sql = db.insert({customer_id: 5, name: 'customer 5'}).into('customer').toSQL();
-      console.log(sql);
-      // const result = await db.raw('insert into customer (customer_ID, name) values ($1, $2)', [5, 'customer 5']);
-      const result = await db.raw(sql.sql, sql.bindings);
-      console.log('result: ', result);
-    });
-  })
 });
