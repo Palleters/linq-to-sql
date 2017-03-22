@@ -11,6 +11,14 @@ export abstract class Expression<T> {
   isOneOf(set: Expr<T>[]): Expression<boolean> {
     return isOneOf(this, set);
   }
+  // note: in future the following 2 methods might not work, if we restrict isNull to nullable types
+  // (requires variance support in TypeScript to be meaningful)
+  isNull(): Expression<boolean> {
+    return isNull<Expression<T>>(this);
+  }
+  isNotNull(): Expression<boolean> {
+    return isNotNull<Expression<T>>(this);
+  }
 }
 
 function constantToSQL(value: any): SQL {
@@ -58,7 +66,8 @@ const normalizeExpression = <T>(expression: Expr<T>) => {
 export class UnaryExpression<TResult, TArg> extends Expression<TResult> {
   constructor(
     public readonly evalFunc: (arg: TArg) => TResult,
-    public readonly sqlOp: string,
+    public readonly sqlPrefix: string,
+    public readonly sqlSuffix: string,
     public readonly arg: Expression<TArg>
   ) {
     super();
@@ -69,9 +78,9 @@ export class UnaryExpression<TResult, TArg> extends Expression<TResult> {
   sql() {
     return combineSQL(
       simpleSQLFragment('('),
-      simpleSQLFragment(this.sqlOp),
-      simpleSQLFragment(' '),
+      simpleSQLFragment(this.sqlPrefix),
       this.arg.sql(),
+      simpleSQLFragment(this.sqlSuffix),
       simpleSQLFragment(')'),
     );
   }
@@ -158,9 +167,11 @@ export class InExpression<T> extends Expression<boolean> {
 }
 
 export const unaryOp = <TResult, TArg>(
-  evalFunc: (arg: TArg) => TResult, sqlOp: string,
+  evalFunc: (arg: TArg) => TResult, 
+  sqlPrefix: string,
+  sqlSuffix: string,
   arg: Expr<TArg>
-) => new UnaryExpression(evalFunc, sqlOp, normalizeExpression(arg));
+) => new UnaryExpression(evalFunc, sqlPrefix, sqlSuffix, normalizeExpression(arg));
 
 export const binaryOp = <TResult, TArg1, TArg2>(
   evalFunc: (arg1: TArg1, arg2: TArg2) => TResult, sqlOp: string,
@@ -182,7 +193,13 @@ export const or = (...args: Expr<boolean>[]) =>
   commutativeOp(args => args.some(item => item), 'OR', 'FALSE', args);
 
 export const not = (arg: Expr<boolean>) =>
-  unaryOp((arg) => !arg, 'NOT', arg);
+  unaryOp((arg) => !arg, 'NOT ', '', arg);
 
 export const isOneOf = <T>(arg1: Expr<T>, arg2: Expr<T[]>) =>
   new InExpression(normalizeExpression(arg1), normalizeExpression(arg2));
+
+export const isNull = <T>(arg: Expr<T | null>) =>
+  unaryOp((arg) => arg === null, '', ' IS NULL', arg);
+
+export const isNotNull = <T>(arg: Expr<T | null>) =>
+  unaryOp((arg) => arg !== null, '', ' IS NOT NULL', arg);

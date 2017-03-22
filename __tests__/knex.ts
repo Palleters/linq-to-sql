@@ -28,10 +28,12 @@ describe('knex integration', async () => {
         {
           customerid: 1, // TODO: underscore, case
           name: 'customer 1',
+          address: null,
         },
         {
           customerid: 3,
           name: 'customer 3',
+          address: 'customer 3 address',
         },
       ]);
     });
@@ -45,10 +47,12 @@ describe('knex integration', async () => {
         {
           customerid: 1, // TODO: underscore, case
           name: 'customer 1',
+          address: null,
         },
         {
           customerid: 3,
           name: 'customer 3',
+          address: 'customer 3 address',
         },
       ]);
     });
